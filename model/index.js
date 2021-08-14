@@ -1,20 +1,43 @@
-// const fs = require('fs/promises')
-// const contacts = require('./contacts.json')
+const ContactsRepository = require('../repository/contactsRepo')
 
-const listContacts = async () => {}
+class ContactsService {
+  constructor() {
+    this.repositories = {
+      contacts: new ContactsRepository(),
+    }
+  }
 
-const getContactById = async (contactId) => {}
+  refactorId(id) {
+    return isNaN(id) ? id : Number(id)
+  }
 
-const removeContact = async (contactId) => {}
+  listContacts() {
+    const data = this.repositories.contacts.getAll()
+    return data
+  }
 
-const addContact = async (body) => {}
+  getContactById({ contactId }) {
+    const refactoredId = this.refactorId(contactId)
+    const data = this.repositories.contacts.getById(refactoredId)
+    return data
+  }
 
-const updateContact = async (contactId, body) => {}
+  addContact(body) {
+    const data = this.repositories.contacts.create(body)
+    return data
+  }
 
-module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
+  updateContact({ contactId }, body) {
+    const refactoredId = this.refactorId(contactId)
+    const data = this.repositories.contacts.update(refactoredId, body)
+    return data
+  }
+
+  removeContact({ contactId }) {
+    const refactoredId = this.refactorId(contactId)
+    const data = this.repositories.contacts.delete(refactoredId)
+    return data
+  }
 }
+
+module.exports = ContactsService
