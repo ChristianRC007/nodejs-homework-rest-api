@@ -6,7 +6,6 @@ const contactsService = new ContactsService()
 const getAll = async (req, res, next) => {
   try {
     const contacts = await contactsService.listContacts()
-    console.log(contacts)
     res.status(httpCodes.OK).json({
       status: 'success',
       code: httpCodes.OK,
