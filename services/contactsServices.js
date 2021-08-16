@@ -1,9 +1,9 @@
 const ContactsRepository = require('../repository/contactsRepo')
 
-class ContactsService {
+class ContactsServices {
   constructor() {
     this.repositories = {
-      contacts: new ContactsRepository(),
+      contacts: ContactsRepository,
     }
   }
 
@@ -40,4 +40,4 @@ class ContactsService {
   }
 }
 
-module.exports = ContactsService
+module.exports = new ContactsServices()

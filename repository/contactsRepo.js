@@ -3,56 +3,69 @@ const fs = require('fs/promises')
 
 class ContactsRepository {
   async getAll() {
-    const result = await fs.readFile('./db/contacts.json')
-    return JSON.parse(result)
+    try {
+      const result = await fs.readFile('./db/contacts.json')
+      return JSON.parse(result)
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async getById(id) {
-    const data = await this.getAll()
-    const result = data.find((el) => el.id === id)
-    return result
+    try {
+      const data = await this.getAll()
+      const result = data.find((el) => el.id === id)
+      return result
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async create(body) {
-    const id = uuid()
-    const record = {
-      id,
-      ...body,
+    try {
+      const id = uuid()
+      const record = {
+        id,
+        ...body,
+      }
+      const data = await this.getAll()
+      data.push(record)
+      fs.writeFile('./db/contacts.json', JSON.stringify(data, null, 2))
+      return record
+    } catch (error) {
+      console.log(error)
     }
-    const data = await this.getAll()
-    data.push(record)
-    fs.writeFile('./db/contacts.json', JSON.stringify(data, null, 2), (err) => {
-      if (err) throw err
-    })
-    return record
   }
 
   async update(id, body) {
-    const data = await this.getAll()
-    const dataToUpdate = [...data]
-    const contact = data.find((el) => el.id === id)
-    const updatedContact = { ...contact, ...body }
-    dataToUpdate[dataToUpdate.indexOf(contact)] = updatedContact
+    try {
+      const data = await this.getAll()
+      const dataToUpdate = [...data]
+      const contact = data.find((el) => el.id === id)
+      const updatedContact = { ...contact, ...body }
 
-    fs.writeFile('./db/contacts.json', JSON.stringify(dataToUpdate, null, 2), (err) => {
-      if (err) throw err
-    })
+      dataToUpdate[dataToUpdate.indexOf(contact)] = updatedContact
+      fs.writeFile('./db/contacts.json', JSON.stringify(dataToUpdate, null, 2))
 
-    return updatedContact
+      return updatedContact
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async delete(id) {
-    const data = await this.getAll()
-    const contact = data.find((el) => el.id === id)
-    if (contact) {
-      const updatedData = data.filter((el) => el.id !== id)
-      fs.writeFile('./db/contacts.json', JSON.stringify(updatedData, null, 2), (err) => {
-        if (err) throw err
-      })
+    try {
+      const data = await this.getAll()
+      const contact = data.find((el) => el.id === id)
+      if (contact) {
+        const updatedData = data.filter((el) => el.id !== id)
+        fs.writeFile('./db/contacts.json', JSON.stringify(updatedData, null, 2))
+      }
       return contact
+    } catch (error) {
+      console.log(error)
     }
-    return false
   }
 }
 
-module.exports = ContactsRepository
+module.exports = new ContactsRepository()
