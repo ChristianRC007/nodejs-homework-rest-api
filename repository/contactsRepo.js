@@ -2,34 +2,58 @@ const Contact = require('../models/Contact')
 
 class ContactsRepository {
   async getAll() {
-    const result = await Contact.find()
-    return result
+    try {
+      const result = await Contact.find()
+      return result
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async getById(id) {
-    const result = await Contact.findById(id)
-    return result
+    try {
+      const result = await Contact.findById(id)
+      return result
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async create(body) {
-    const result = await Contact.create(body)
-    return result
+    try {
+      const result = await Contact.create(body)
+      return result
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async update(id, body) {
-    const result = await Contact.findByIdAndUpdate(id, body, { new: true })
-    return result
+    try {
+      const result = await Contact.findByIdAndUpdate(id, body, { new: true })
+      return result
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async delete(id) {
-    const result = await Contact.findByIdAndRemove(id)
-    return result
+    try {
+      const result = await Contact.findByIdAndRemove(id)
+      return result
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async updateStatus(id, body) {
-    const result = await Contact.findByIdAndUpdate(id, body, { new: true })
-    return result
+    try {
+      const result = await Contact.findByIdAndUpdate(id, body, { new: true })
+      return result
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
 
-module.exports = ContactsRepository
+module.exports = new ContactsRepository()
