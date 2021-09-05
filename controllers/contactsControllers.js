@@ -1,11 +1,11 @@
-const { httpCodes } = require('../helpers/contacts')
+const { httpCodes } = require('../helpers/httpCodes')
 const ContactsServices = require('../services/contactsServices')
 
 class ContactsControllers {
   async getAll(req, res, next) {
-    console.log(this)
     try {
-      const contacts = await ContactsServices.listContacts()
+      const userId = req.user.id
+      const contacts = await ContactsServices.listContacts(userId, req.query)
       res.status(httpCodes.OK).json({
         status: 'success',
         code: httpCodes.OK,
@@ -20,7 +20,8 @@ class ContactsControllers {
 
   async getByID(req, res, next) {
     try {
-      const contact = await ContactsServices.getContactById(req.params)
+      const userId = req.user.id
+      const contact = await ContactsServices.getContactById(userId, req.params.contactId)
       if (contact) {
         return res.status(httpCodes.OK).json({
           status: 'success',
@@ -42,7 +43,8 @@ class ContactsControllers {
 
   async postContact(req, res, next) {
     try {
-      const contact = await ContactsServices.addContact(req.body)
+      const userId = req.user.id
+      const contact = await ContactsServices.addContact(userId, req.body)
       res.status(httpCodes.CREATED).json({
         status: 'success',
         code: httpCodes.CREATED,
@@ -57,13 +59,14 @@ class ContactsControllers {
 
   async updateContact(req, res, next) {
     try {
+      const userId = req.user.id
       if (req.headers['content-length'] === '0') {
         return res.status(httpCodes.BAD_REQUEST).json({
           status: httpCodes.BAD_REQUEST,
           message: 'missing fields',
         })
       }
-      const contact = await ContactsServices.updateContact(req.params, req.body)
+      const contact = await ContactsServices.updateContact(userId, req.params.contactId, req.body)
       if (contact) {
         return res.status(httpCodes.OK).json({
           status: 'success',
@@ -85,7 +88,8 @@ class ContactsControllers {
 
   async deleteContact(req, res, next) {
     try {
-      const contact = await ContactsServices.removeContact(req.params)
+      const userId = req.user.id
+      const contact = await ContactsServices.removeContact(userId, req.params.contactId)
       if (contact) {
         return res.status(httpCodes.OK).json({
           status: 'success',
@@ -107,13 +111,14 @@ class ContactsControllers {
 
   async updateStatusContact(req, res, next) {
     try {
+      const userId = req.user.id
       if (req.headers['content-length'] === '0') {
         return res.status(httpCodes.BAD_REQUEST).json({
           status: httpCodes.BAD_REQUEST,
           message: 'missing field favourite',
         })
       }
-      const contact = await ContactsServices.updateContact(req.params, req.body)
+      const contact = await ContactsServices.updateContact(userId, req.params.contactId, req.body)
       if (contact?.id) {
         return res.status(httpCodes.OK).json({
           status: 'success',

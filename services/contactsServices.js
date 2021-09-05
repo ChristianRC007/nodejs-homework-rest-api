@@ -7,33 +7,33 @@ class ContactsServices {
     }
   }
 
-  listContacts() {
-    const data = this.repositories.contacts.getAll()
+  listContacts(userId, requestQuery) {
+    const data = this.repositories.contacts.getAll(userId, requestQuery)
     return data
   }
 
-  getContactById({ contactId }) {
-    const data = this.repositories.contacts.getById(contactId)
+  getContactById(userId, contactId) {
+    const data = this.repositories.contacts.getById(userId, contactId)
     return data
   }
 
-  addContact(body) {
-    const data = this.repositories.contacts.create(body)
+  addContact(userId, body) {
+    const data = this.repositories.contacts.create(userId, body)
     return data
   }
 
-  updateContact({ contactId }, body) {
-    const data = this.repositories.contacts.update(contactId, body)
+  updateContact(userId, contactId, body) {
+    const data = this.repositories.contacts.update(userId, contactId, body)
     return data
   }
 
-  removeContact({ contactId }) {
-    const data = this.repositories.contacts.delete(contactId)
+  removeContact(userId, contactId) {
+    const data = this.repositories.contacts.delete(userId, contactId)
     return data
   }
 
-  updateStatus({ contactId }, body) {
-    const data = this.repositories.contacts.updateStatus(contactId, body)
+  updateStatus(userId, contactId, body) {
+    const data = this.repositories.contacts.updateStatus(userId, contactId, body)
     return data
   }
 }

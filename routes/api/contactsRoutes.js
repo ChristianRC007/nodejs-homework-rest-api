@@ -6,16 +6,18 @@ const {
   validateUpdateContact,
 } = require('../../validators/contactsValidator')
 
-router.get('/', ContactsControllers.getAll)
+const guard = require('../../helpers/guard')
 
-router.get('/:contactId', ContactsControllers.getByID)
+router.get('/', guard, ContactsControllers.getAll)
 
-router.post('/', validateCreateContact, ContactsControllers.postContact)
+router.get('/:contactId', guard, ContactsControllers.getByID)
 
-router.delete('/:contactId', ContactsControllers.deleteContact)
+router.post('/', guard, validateCreateContact, ContactsControllers.postContact)
 
-router.put('/:contactId', validateUpdateContact, ContactsControllers.updateContact)
+router.delete('/:contactId', guard, ContactsControllers.deleteContact)
 
-router.patch('/:contactId/favourite', ContactsControllers.updateStatusContact)
+router.put('/:contactId', guard, validateUpdateContact, ContactsControllers.updateContact)
+
+router.patch('/:contactId/favourite', guard, ContactsControllers.updateStatusContact)
 
 module.exports = router
