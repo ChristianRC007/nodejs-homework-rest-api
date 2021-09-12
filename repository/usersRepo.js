@@ -49,6 +49,14 @@ class UsersRepository {
       console.log(error)
     }
   }
+
+  async updateAvatar(id, avatarURL) {
+    try {
+      return await User.updateOne({ _id: id }, { avatarURL })
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
 
 module.exports = new UsersRepository()

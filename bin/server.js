@@ -1,9 +1,12 @@
 const app = require('../app')
 const mongoose = require('mongoose')
+const createFolderIsNotExist = require('../middleware/createFolder')
 require('dotenv').config()
 
 const PORT = process.env.PORT || 3000
 const dbURI = process.env.DB_URI
+const TEMP_DIR = process.env.TEMP_DIR
+const AVATARS_DIR = process.env.AVATARS_DIR
 
 const db = mongoose.connect(dbURI, {
   useNewUrlParser: true,
@@ -25,7 +28,9 @@ mongoose.connection.on('disconnected', () => {
 })
 
 db.then(() => {
-  app.listen(PORT, function () {
+  app.listen(PORT, async function () {
+    await createFolderIsNotExist(TEMP_DIR)
+    await createFolderIsNotExist(AVATARS_DIR)
     console.log(`Server running. Use our API on port: ${PORT}`)
   })
 }).catch((err) => {

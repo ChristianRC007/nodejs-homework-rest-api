@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose')
+const gr = require('gravatar')
 
 const bcrypt = require('bcrypt')
 const SALT = 8
@@ -25,6 +26,12 @@ const userSchema = new Schema({
   token: {
     type: String,
     default: null,
+  },
+  avatarURL: {
+    type: String,
+    default: function () {
+      return gr.url(this.email, { s: '250' }, true)
+    },
   },
 })
 

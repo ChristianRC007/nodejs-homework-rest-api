@@ -1,5 +1,6 @@
 const { httpCodes } = require('../helpers/httpCodes')
 const UsersServices = require('../services/usersServices')
+const UploadFileService = require('../services/localFileUpload')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
@@ -16,14 +17,14 @@ class UsersControllers {
           message: 'This email is already registered',
         })
       }
-      const { id, name, email } = await UsersServices.createUser(req.body)
+      const { id, email, avatarURL } = await UsersServices.createUser(req.body)
       res.status(httpCodes.CREATED).json({
         status: 'success',
         code: httpCodes.CREATED,
         data: {
           id,
-          name,
           email,
+          avatarURL,
         },
       })
     } catch (error) {
@@ -69,8 +70,8 @@ class UsersControllers {
   async getCurrent(req, res, next) {
     try {
       const token = req.get('Authorization').split(' ')[1]
-      const { subscription, email } = await UsersServices.getCurrentUser(token)
-      res.status(httpCodes.OK).json({ data: { subscription, email } })
+      const { subscription, email, avatarURL } = await UsersServices.getCurrentUser(token)
+      res.status(httpCodes.OK).json({ data: { subscription, email, avatarURL } })
     } catch (error) {
       next(error)
     }
@@ -81,6 +82,18 @@ class UsersControllers {
       const token = req.get('Authorization').split(' ')[1]
       const { subscription, email } = await UsersServices.updateSubscription(token, req.body)
       res.status(httpCodes.OK).json({ data: { subscription, email } })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async updateAvatar(req, res, next) {
+    try {
+      const id = req.user.id
+      const upload = new UploadFileService(process.env.AVATARS_DIR)
+      const avatarURL = await upload.saveAvatar({ userId: id, file: req.file })
+      await upload.updateAvatar(id, avatarURL)
+      res.status(httpCodes.OK).json({ status: 'success', data: { avatarURL } })
     } catch (error) {
       next(error)
     }
