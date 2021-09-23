@@ -1,6 +1,7 @@
 const { httpCodes } = require('../helpers/httpCodes')
 const UsersServices = require('../services/usersServices')
 const UploadFileService = require('../services/localFileUpload')
+const MailService = require('../services/mailService')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
@@ -17,7 +18,11 @@ class UsersControllers {
           message: 'This email is already registered',
         })
       }
-      const { id, email, avatarURL } = await UsersServices.createUser(req.body)
+      const { id, email, avatarURL, verificationToken } = await UsersServices.createUser(req.body)
+      await MailService.sendActivationMail(
+        email,
+        `${process.env.API_URL}/api/users/verify/${verificationToken}`,
+      )
       res.status(httpCodes.CREATED).json({
         status: 'success',
         code: httpCodes.CREATED,
@@ -36,7 +41,7 @@ class UsersControllers {
     try {
       const user = await UsersServices.findByEmail(req.body.email)
       const isValidPassword = await user?.isValidPassword(req.body.password)
-      if (!user || !isValidPassword) {
+      if (!user || !isValidPassword || !user.isVerified) {
         return res.status(httpCodes.UNAUTHORIZED).json({
           status: 'error',
           code: httpCodes.UNAUTHORIZED,
@@ -94,6 +99,53 @@ class UsersControllers {
       const avatarURL = await upload.saveAvatar({ userId: id, file: req.file })
       await upload.updateAvatar(id, avatarURL)
       res.status(httpCodes.OK).json({ status: 'success', data: { avatarURL } })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async verify(req, res, next) {
+    try {
+      const user = await UsersServices.findByVerificationToken(req.params.verificationToken)
+      if (user) {
+        await UsersServices.updateVerificationToken(user.id, true, null)
+        res
+          .status(httpCodes.OK)
+          .json({ status: 'success', message: 'Your account successfully verified' })
+      }
+      return res.status(httpCodes.BAD_REQUEST).json({
+        status: 'error',
+        code: httpCodes.BAD_REQUEST,
+        message: 'Verification token is not valid',
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async repeatVerifyEmail(req, res, next) {
+    try {
+      const user = await UsersServices.findByEmail(req.body.email)
+      if (user) {
+        const { email, verificationToken, isVerified } = user
+        if (!isVerified) {
+          await MailService.sendActivationMail(
+            email,
+            `${process.env.API_URL}/api/users/verify/${verificationToken}`,
+          )
+          res.status(httpCodes.OK).json({ status: 'success', message: 'New activation link sent' })
+        }
+        res.status(httpCodes.CONFLICT).json({
+          status: 'error',
+          code: httpCodes.CONFLICT,
+          message: 'Verification has already been passed',
+        })
+      }
+      res.status(httpCodes.NOT_FOUND).json({
+        status: 'error',
+        code: httpCodes.NOT_FOUND,
+        message: 'User not found',
+      })
     } catch (error) {
       next(error)
     }

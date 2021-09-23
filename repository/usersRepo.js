@@ -57,6 +57,22 @@ class UsersRepository {
       console.log(error)
     }
   }
+
+  async findByVerificationToken(verificationToken) {
+    try {
+      return await User.findOne({ verificationToken })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async updateVerificationToken(id, isVerified, verificationToken) {
+    try {
+      return await User.updateOne({ _id: id }, { isVerified, verificationToken })
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
 
 module.exports = new UsersRepository()

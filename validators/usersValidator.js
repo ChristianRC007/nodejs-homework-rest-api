@@ -15,6 +15,12 @@ const schemaLoginUser = Joi.object({
   password: Joi.string().required().min(3).max(15),
 })
 
+const schemaVerifyUser = Joi.object({
+  email: Joi.string()
+    .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'co', 'uk', 'ru', 'ua', 'org'] } })
+    .required(),
+})
+
 const validate = (schema, body, next) => {
   const { error } = schema.validate(body)
   if (error) {
@@ -34,5 +40,8 @@ module.exports = {
   },
   validateLogin: (req, res, next) => {
     return validate(schemaLoginUser, req.body, next)
+  },
+  validateVerification: (req, res, next) => {
+    return validate(schemaVerifyUser, req.body, next)
   },
 }

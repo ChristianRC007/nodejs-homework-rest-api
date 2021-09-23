@@ -1,5 +1,6 @@
 const { Schema, model } = require('mongoose')
 const gr = require('gravatar')
+const { v4: uuid } = require('uuid')
 
 const bcrypt = require('bcrypt')
 const SALT = 8
@@ -32,6 +33,15 @@ const userSchema = new Schema({
     default: function () {
       return gr.url(this.email, { s: '250' }, true)
     },
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+    required: true,
+    default: uuid(),
   },
 })
 

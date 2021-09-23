@@ -31,6 +31,16 @@ class UsersServices {
     const data = this.repositories.users.updateToken(id, token)
     return data
   }
+
+  findByVerificationToken(token) {
+    const data = this.repositories.users.findByVerificationToken(token)
+    return data
+  }
+
+  updateVerificationToken(id, isVerified, verificationToken) {
+    const data = this.repositories.users.updateVerificationToken(id, isVerified, verificationToken)
+    return data
+  }
 }
 
 module.exports = new UsersServices()
